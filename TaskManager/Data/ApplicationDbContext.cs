@@ -1,14 +1,19 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TaskManager.Data.Configurations;
+using TaskManager.Data.Entites;
 
 namespace TaskManager.Data
 {
     public class ApplicationDbContext : DbContext
     {
-        private readonly SqlConnection _sqlConnection;
         public ApplicationDbContext(DbContextOptions options, IConfiguration configuration) : base(options)
         {
-            _sqlConnection = new SqlConnection(configuration.GetConnectionString("ApplicationDBContext"));
+        }
+        public virtual DbSet<TaskItem> TaskItems { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfiguration(new TaskItemConfig());
+            base.OnModelCreating(modelBuilder);
         }
     }
 }
