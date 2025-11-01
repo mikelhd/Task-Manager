@@ -1,4 +1,6 @@
-﻿namespace TaskManager.Data.Entites
+﻿using TaskManager.Data.Enum;
+
+namespace TaskManager.Data.Entites
 {
     public class TaskItem
     {
@@ -9,6 +11,7 @@
         public DateTime UpdatedDate { get; set; }
         public DateTime DoneDate { get; set; }
         public DateTime DueDate { get; set; }
+        public Status State { get; set; }
 
     }
 }
