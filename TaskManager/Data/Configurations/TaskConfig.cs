@@ -10,6 +10,10 @@ namespace TaskManager.Data.Configurations
         {
             builder.ToTable(nameof(TaskItem));
             builder.HasKey(x => x.Id);
+            builder.HasMany(x => x.Tags)
+                    .WithMany(x => x.TaskItems)
+                    .UsingEntity(j => j.ToTable("TaskItemTag"));
+
         }
     }
 }

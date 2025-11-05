@@ -1,0 +1,120 @@
+﻿@{
+    ViewData["Title"] = "مدیریت وظایف";
+}
+@model TaskItemViewModel
+<h2>مدیریت تسک‌ها</h2>
+<div class="card col-md-12 p-3">
+    <h3 class="text-center">تسک ها</h3>
+    <a class="col-md-2 btn btn-sm btn-success" href="@Url.Action("Save","Task")">ایجاد</a>
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th></th>
+                <th>عنوان</th>
+                <th>توضیحات</th>
+                <th>وضعیت</th>
+                <th>تاریخ سررسید</th>
+                <th>تگ ها</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model.ActiveTasks)
+            {
+                <tr>
+                    <td>
+                        <input type="hidden" asp-for="@task.Id" />
+                        <a href="@Url.Action("MarkAsDone","Task",new { id = task.Id })" class="btn @( task.State.ToString() == "done" ? "btn-success" : "btn-danger") btn-sm"><i class="fa fa-plus"></i></a>
+                    </td>
+                    <td>@task.Title</td>
+                    <td>@task.Description.</td>
+                    @if (task.State.ToString() == "newTask")
+                    {
+                        <td>
+                            <span class="badge bg-info">جدید</span>
+                        </td>
+                    }
+                    else if (task.State.ToString() == "active")
+                    {
+                        <td>
+                            <span class="badge bg-success">فعال</span>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <span class="badge bg-danger">اتمام</span>
+                        </td>
+                    }
+
+                    <td>@task.DueDate.ToShortDateString()</td>
+                    @if (task.Tags is not null && task.Tags.Any())
+                    {
+                        @foreach (var tag in task.Tags)
+                        {
+                            <td>
+                                @tag.Name
+                            </td>
+                        }
+                    }
+                    <td>
+                        <a class="btn btn-sm btn-success"
+                           href="@Url.Action("Save", "Task", new { id = task.Id })">
+                            ویرایش
+                        </a>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+</div>
+<div class="card col-md-12 p-3 my-3">
+    <h3 class="text-center">تسک های انجام شده</h3>
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th></th>
+                <th>عنوان</th>
+                <th>توضیحات</th>
+                <th>وضعیت</th>
+                <th>تاریخ سررسید</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in Model.DoneTasks)
+            {
+
+                <tr>
+                    <td>
+                        <input type="hidden" asp-for="@task.Id" />
+                        <a href="@Url.Action("MarkAsDone","Task",new { id = task.Id })" class="btn @( task.State.ToString() == "done" ? "btn-success" : "btn-danger") btn-sm"></a>
+                    </td>
+                    <td>@task.Title</td>
+                    <td>@task.Description.</td>
+                    @if (task.State.ToString() == "newTask")
+                    {
+                        <td>
+                            <span class="badge bg-info">جدید</span>
+                        </td>
+                    }
+                    else if (task.State.ToString() == "active")
+                    {
+                        <td>
+                            <span class="badge bg-success">فعال</span>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <span class="badge bg-danger">اتمام</span>
+                        </td>
+                    }
+
+                    <td>@task.DueDate.ToShortDateString()</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

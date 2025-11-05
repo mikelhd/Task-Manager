@@ -1,0 +1,35 @@
+﻿@using static TaskManager.Models.TagModel
+@{
+    ViewData["Title"] = "تگ ها";
+}
+@model List<GetTagResponse>
+<div class="card col-md-12 p-3">
+    <h3>تگ ها</h3>
+    <a class="btn btn-sm btn-success" href="@Url.Action("Save","Tag")">ایجاد</a>
+    <table class="table mt-3">
+        <thead>
+            <tr>
+                <th>عنوان</th>
+                <th>وضعیت</th>
+                <th>عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tag in Model)
+            {
+                <tr>
+                    <td>@tag.Name</td>
+                    <td>@tag.IsActive</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-success" href="@Url.Action("Save","Tag",new { id = tag.Id })">
+                            ویرایش
+                        </a>
+                        <a class="btn btn-sm btn-outline-danger" href="@Url.Action("Delete","Tag",new { id = tag.Id })">
+                            حذف
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

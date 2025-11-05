@@ -10,6 +10,7 @@ namespace TaskManager.Data
         {
         }
         public virtual DbSet<TaskItem> TaskItems { get; set; }
+        public virtual DbSet<Tag> Tags { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new TaskItemConfig());

@@ -12,6 +12,7 @@ namespace TaskManager.Data.Entites
         public DateTime DoneDate { get; set; }
         public DateTime DueDate { get; set; }
         public Status State { get; set; }
+        public List<Tag> Tags { get; set; }
 
     }
 }

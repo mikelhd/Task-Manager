@@ -1,0 +1,19 @@
+﻿@using static TaskManager.Models.TagModel
+@{
+
+}
+@model SaveTagRequest
+<div class="card col-md-12 p-3">
+    <form method="post" action="@Url.Action("Save","Tag")">
+        <input type="hidden" asp-for="@Model.Id"/>
+        <div class="form-group">
+            <label class="control-label">عنوان</label>
+            <input type="text" class="form-control" asp-for="@Model.Name"/>
+        </div>
+        <div class="form-group">
+            <label class="control-label">وضعیت</label>
+            <input type="checkbox" asp-for="@Model.IsActive"/>
+        </div>
+        <button type="submit" class="btn btn-sm btn-success">ثبت</button>
+    </form>
+</div>

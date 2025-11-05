@@ -4,6 +4,6 @@
     {
         active = 1,
         done = 2,
-        closed = 3
+        newTask = 3
     }
 }

@@ -1,16 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using TaskManager.Data;
 using TaskManager.Data.Entites;
 using TaskManager.Models;
-using TaskManager.Models.TaskItem;
+using static TaskManager.Models.TagModel;
+using static TaskManager.Models.TaskItem.GetTaskItem;
 
 namespace TaskManager.Services
 {
     public interface ITaskItemService
     {
-        Task<List<GetTaskItem.GetTaskItemResponse>> Get(GetTaskItem.GetTaskItemRequest request);
-        Task<GetTaskItem.GetTaskItemResponse> GetById(int id);
-        Task<ResponseBase> Save(GetTaskItem.SaveTaskItemRequest request);
+        Task<List<GetTaskItemResponse>> Get(GetTaskItemRequest request);
+        Task<GetTaskItemResponse> GetById(int id);
+        Task<ResponseBase> Save(SaveTaskItemRequest request);
         Task<ResponseBase> Delete(int id);
     }
     public class TaskItemService : ITaskItemService
@@ -22,11 +24,11 @@ namespace TaskManager.Services
         }
 
 
-        public async Task<List<GetTaskItem.GetTaskItemResponse>> Get(GetTaskItem.GetTaskItemRequest request)
+        public async Task<List<GetTaskItemResponse>> Get(GetTaskItemRequest request)
         {
-            var query = _context.TaskItems.AsQueryable();
+            var query = _context.TaskItems.Include(t => t.Tags).AsQueryable();
 
-            var response = await query.Select(x => new GetTaskItem.GetTaskItemResponse
+            var response = await query.Select(x => new GetTaskItemResponse
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -36,15 +38,20 @@ namespace TaskManager.Services
                 CreatedDate = x.CreatedDate,
                 Description = x.Description,
                 UpdatedDate = x.UpdatedDate,
+                Tags = x.Tags.Select(t => new GetTagResponse
+                {
+                    Id = t.Id,
+                    Name = t.Name
+                }).ToList()
             }).ToListAsync();
             return response;
         }
 
-        public async Task<GetTaskItem.GetTaskItemResponse> GetById(int id)
+        public async Task<GetTaskItemResponse> GetById(int id)
         {
             var query = _context.TaskItems.Where(x => x.Id == id);
 
-            var response = await query.Select(x => new GetTaskItem.GetTaskItemResponse
+            var response = await query.Select(x => new GetTaskItemResponse
             {
                 Id = x.Id,
                 Title = x.Title,
@@ -53,17 +60,42 @@ namespace TaskManager.Services
                 DoneDate = x.DoneDate,
                 CreatedDate = x.CreatedDate,
                 Description = x.Description,
-                UpdatedDate = x.UpdatedDate
+                UpdatedDate = x.UpdatedDate,
+                Tags = x.Tags.Select(t => new GetTagResponse
+                {
+                    Id = t.Id,
+                    Name = t.Name
+                }).ToList()
             }).FirstOrDefaultAsync();
             return response;
         }
 
-        public async Task<ResponseBase> Save(GetTaskItem.SaveTaskItemRequest request)
+        public async Task<ResponseBase> Save(SaveTaskItemRequest request)
         {
+            DateTime? dueDateMiladi = null;
+
+            if (!string.IsNullOrEmpty(request.DueDate))
+            {
+                try
+                {
+                    // پشتیبانی از انواع جداکننده (/, -)
+                    var parts = request.DueDate.Split('/', '-', '.');
+                    int year = int.Parse(parts[0]);
+                    int month = int.Parse(parts[1]);
+                    int day = int.Parse(parts[2]);
+
+                    var persian = new PersianCalendar();
+                    dueDateMiladi = persian.ToDateTime(year, month, day, 0, 0, 0, 0);
+                }
+                catch
+                {
+                    dueDateMiladi = null;
+                }
+            }
             TaskItem find = null;
             if (request.Id > 0 && request.Id is not null)
             {
-                find = await _context.TaskItems.FindAsync(request.Id);
+                find = await _context.TaskItems.Include(t => t.Tags).FirstOrDefaultAsync(t => t.Id == request.Id);
             }
             if (find is null)
             {
@@ -71,23 +103,33 @@ namespace TaskManager.Services
                 {
                     Title = request.Title,
                     State = request.State,
-                    DueDate = request.DueDate,
-                    DoneDate = request.DoneDate,
+                    DueDate = dueDateMiladi.GetValueOrDefault(),
                     CreatedDate = DateTime.Now,
                     Description = request.Description,
-                    UpdatedDate = request.UpdatedDate,
                 };
+                if (request.TagIds is not null && request.TagIds.Any())
+                {
+                    var tags = await _context.Tags.Where(t => request.TagIds.Contains(t.Id)).ToListAsync();
+                    find.Tags = tags;
+                }
                 _context.TaskItems.Add(find);
             }
             else
             {
                 find.Title = request.Title;
                 find.State = request.State;
-                find.DueDate = request.DueDate;
-                find.DoneDate = request.DoneDate;
+                find.DueDate = dueDateMiladi.GetValueOrDefault();
                 find.Description = request.Description;
-                find.CreatedDate = DateTime.Now;
-                find.UpdatedDate = request.UpdatedDate;
+                find.UpdatedDate = DateTime.Now;
+                find.Tags.Clear();
+                if (request.TagIds is not null && request.TagIds.Any())
+                {
+                    var tags = await _context.Tags.Where(t => request.TagIds.Contains(t.Id)).ToListAsync();
+                    foreach (var tag in tags)
+                    {
+                        find.Tags.Add(tag);
+                    }
+                }
                 _context.TaskItems.Update(find);
             }
             await _context.SaveChangesAsync();
@@ -101,6 +143,7 @@ namespace TaskManager.Services
                 return new ResponseBase(false);
             }
             _context.TaskItems.Remove(task);
+            _context.SaveChangesAsync();
             return new ResponseBase(true);
         }
     }

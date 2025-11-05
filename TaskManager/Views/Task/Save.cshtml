@@ -1,0 +1,46 @@
+﻿@using static TaskManager.Models.TaskItem.GetTaskItem
+
+@{
+    ViewData["Title"] = "ایجاد تسک جدید";
+}
+@model SaveTaskItemRequest
+<div class="card col-md-12 p-3">
+    <form method="post" action="@Url.Action("Save","Task")" enctype="multipart/form-data">
+        <input type="hidden" asp-for="@Model.Id" />
+        <div class="form-group">
+            <label class="control-label">عنوان</label>
+            <input type="text" class="form-control" asp-for="@Model.Title" />
+        </div>
+        <div class="form-group">
+            <label class="control-label">توضیحات</label>
+            <textarea class="form-control" asp-for="@Model.Description"></textarea>
+        </div>
+        <div class="form-group">
+            <label class="control-label">تاریخ انجام</label>
+            @*<input type="date" class="form-control" asp-for="@Model.DueDate" value="2025-01-01" />*@
+            <input type="text" data-jdp asp-for="@Model.DueDate"/>
+        </div>
+        <div class="form-group">
+            <label class="control-label">وضعیت</label>
+            <select class="form-control" asp-for="@Model.State" asp-items="ViewBag.State">
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="Tags">Tags</label>
+            <select id="Tags" name="TagIds" class="form-control" multiple>
+                @foreach (var tag in ViewBag.AllTags as List<SelectListItem>)
+                {
+                    <option value="@tag.Value">@tag.Text</option>
+                }
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-sm btn-success mt-3">ثبت</button>
+    </form>
+</div>
+@section Scripts{ 
+    <script type="text/javascript">
+        jalaliDatepicker.startWatch();
+
+    </script>
+}
