@@ -48,33 +48,34 @@ namespace TaskManager.Controllers
                     model.Id = response.Id;
                     model.Title = response.Title;
                     model.State = response.State;
-                    if (!string.IsNullOrEmpty(model.DueDateString))
-                    {
-                        // فرض کن در View فیلد date به شکل string (مثل "1404/08/13") میاد
-                        var persianCalendar = new System.Globalization.PersianCalendar();
-                        var parts = model.DueDateString.Split('/');
-                        var year = int.Parse(parts[0]);
-                        var month = int.Parse(parts[1]);
-                        var day = int.Parse(parts[2]);
-                        model.DueDate = persianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
-                    }
-
+                    //if (!string.IsNullOrEmpty(model.DueDateString))
+                    //{
+                    //    // فرض کن در View فیلد date به شکل string (مثل "1404/08/13") میاد
+                    //    var persianCalendar = new System.Globalization.PersianCalendar();
+                    //    var parts = model.DueDateString.Split('/');
+                    //    var year = int.Parse(parts[0]);
+                    //    var month = int.Parse(parts[1]);
+                    //    var day = int.Parse(parts[2]);
+                    //    model.DueDate = persianCalendar.ToDateTime(year, month, day, 0, 0, 0, 0);
+                    //}
+                    model.DueDate = response.DueDate;
                     model.CreatedDate = response.CreatedDate;
                     model.Description = response.Description;
                     model.TagIds = response.Tags.Select(t => t.Id).ToList();
                 }
             }
-            ViewBag.AllTags = _context.Tags.Where(t => t.IsActive == true).Select(t => new SelectListItem
-            {
-                Value = t.Id.ToString(),
-                Text = t.Name
-            }).ToList();
+            ViewBag.AllTags = new MultiSelectList(
+                _context.Tags.Where(t => t.IsActive == true).ToList(),
+                "Id",
+                "Name",
+                model.TagIds
+            );
             ViewBag.State = Enum.GetValues(typeof(Status))
                 .Cast<Status>()
                 .Select(x => new SelectListItem
                 {
                     Value = ((int)x).ToString(),
-                    Text = x.ToString()
+                    Text = x.ToString(),
                 }).ToList();
             return View(model);
         }

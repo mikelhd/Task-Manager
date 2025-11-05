@@ -8,7 +8,7 @@
     <a class="col-md-2 btn btn-sm btn-success" href="@Url.Action("Save","Task")">ایجاد</a>
     <table class="table mt-3">
         <thead>
-            <tr>
+            <tr class="text-center">
                 <th></th>
                 <th>عنوان</th>
                 <th>توضیحات</th>
@@ -21,7 +21,7 @@
         <tbody>
             @foreach (var task in Model.ActiveTasks)
             {
-                <tr>
+                <tr class="text-center">
                     <td>
                         <input type="hidden" asp-for="@task.Id" />
                         <a href="@Url.Action("MarkAsDone","Task",new { id = task.Id })" class="btn @( task.State.ToString() == "done" ? "btn-success" : "btn-danger") btn-sm"><i class="fa fa-plus"></i></a>
@@ -62,6 +62,10 @@
                            href="@Url.Action("Save", "Task", new { id = task.Id })">
                             ویرایش
                         </a>
+                        <a class="btn btn-sm btn-danger"
+                           href="@Url.Action("Delete" , "Task" , new { id = task.Id})">
+                            حذف
+                        </a>
                     </td>
                 </tr>
 
@@ -73,7 +77,7 @@
     <h3 class="text-center">تسک های انجام شده</h3>
     <table class="table mt-3">
         <thead>
-            <tr>
+            <tr class="text-center">
                 <th></th>
                 <th>عنوان</th>
                 <th>توضیحات</th>
@@ -85,10 +89,11 @@
             @foreach (var task in Model.DoneTasks)
             {
 
-                <tr>
+                <tr class="text-center">
                     <td>
                         <input type="hidden" asp-for="@task.Id" />
-                        <a href="@Url.Action("MarkAsDone","Task",new { id = task.Id })" class="btn @( task.State.ToString() == "done" ? "btn-success" : "btn-danger") btn-sm"></a>
+                        @*<input type="checkbox" asp-action="MarkAsDone" asp-controller="Task" asp-route-id="@task.Id"/>*@
+                        <a href="@Url.Action("MarkAsDone","Task",new { id = task.Id })" class="btn @( task.State.ToString() == "done" ? "btn-success" : "btn-danger") btn-sm"><i class="fa-solid @(task.State.ToString() == "done" ? "fa-check" : "fa-trash")"></i></a>
                     </td>
                     <td>@task.Title</td>
                     <td>@task.Description.</td>

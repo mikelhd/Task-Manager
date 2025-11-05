@@ -35,7 +35,7 @@ namespace TaskManager.Models.TaskItem
             public Status State { get; set; }
             public string Title { get; set; }
             public string Description { get; set; }
-            public string DueDate { get; set; }
+            public DateTime DueDate { get; set; }
             public DateTime DoneDate { get; set; }
             public DateTime CreatedDate { get; set; }
             public DateTime UpdatedDate { get; set; }

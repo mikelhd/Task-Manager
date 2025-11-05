@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 using TaskManager.Data;
 using TaskManager.Data.Entites;
 using TaskManager.Models;
@@ -72,26 +71,26 @@ namespace TaskManager.Services
 
         public async Task<ResponseBase> Save(SaveTaskItemRequest request)
         {
-            DateTime? dueDateMiladi = null;
+            //DateTime? dueDateMiladi = null;
 
-            if (!string.IsNullOrEmpty(request.DueDate))
-            {
-                try
-                {
-                    // پشتیبانی از انواع جداکننده (/, -)
-                    var parts = request.DueDate.Split('/', '-', '.');
-                    int year = int.Parse(parts[0]);
-                    int month = int.Parse(parts[1]);
-                    int day = int.Parse(parts[2]);
+            //if (!string.IsNullOrEmpty(request.DueDate))
+            //{
+            //    try
+            //    {
+            //        // پشتیبانی از انواع جداکننده (/, -)
+            //        var parts = request.DueDate.Split('/', '-', '.');
+            //        int year = int.Parse(parts[0]);
+            //        int month = int.Parse(parts[1]);
+            //        int day = int.Parse(parts[2]);
 
-                    var persian = new PersianCalendar();
-                    dueDateMiladi = persian.ToDateTime(year, month, day, 0, 0, 0, 0);
-                }
-                catch
-                {
-                    dueDateMiladi = null;
-                }
-            }
+            //        var persian = new PersianCalendar();
+            //        dueDateMiladi = persian.ToDateTime(year, month, day, 0, 0, 0, 0);
+            //    }
+            //    catch
+            //    {
+            //        dueDateMiladi = null;
+            //    }
+            //}
             TaskItem find = null;
             if (request.Id > 0 && request.Id is not null)
             {
@@ -103,7 +102,7 @@ namespace TaskManager.Services
                 {
                     Title = request.Title,
                     State = request.State,
-                    DueDate = dueDateMiladi.GetValueOrDefault(),
+                    DueDate = request.DueDate,
                     CreatedDate = DateTime.Now,
                     Description = request.Description,
                 };
@@ -118,7 +117,7 @@ namespace TaskManager.Services
             {
                 find.Title = request.Title;
                 find.State = request.State;
-                find.DueDate = dueDateMiladi.GetValueOrDefault();
+                find.DueDate = request.DueDate;
                 find.Description = request.Description;
                 find.UpdatedDate = DateTime.Now;
                 find.Tags.Clear();
